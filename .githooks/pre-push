@@ -1,0 +1,25 @@
+#!/bin/sh
+# .githooks/pre-push
+# Bloquea el push directo a ramas protegidas (main y dev).
+# Saltar (admin/emergencia):  git push --no-verify
+#                             SKIP_PROTECTED_PUSH=1 git push ...
+protected="refs/heads/main refs/heads/dev"
+
+if [ "$SKIP_PROTECTED_PUSH" = "1" ]; then
+  exit 0
+fi
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  for p in $protected; do
+    if [ "$remote_ref" = "$p" ]; then
+      echo ""
+      echo "  [X] Push directo a '$remote_ref' bloqueado por .githooks/pre-push."
+      echo "      Crea una rama y un Pull Request hacia esa rama."
+      echo "      (o usa 'git push --no-verify' si eres admin)"
+      echo ""
+      exit 1
+    fi
+  done
+done
+
+exit 0
