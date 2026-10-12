@@ -62,15 +62,16 @@ bun install
 
 ## 4. Crear tu rama (por cada issue)
 
-Regla del equipo: **una rama por issue**, con el nombre
-`ELE-<número>/<palabra-corta>` (el número de la issue de Linear / la de GitHub).
+Regla del equipo: **una rama por issue**, con el nombre que **Linear sugiere**
+para tu issue: en la issue pulsa el botón para copiar el nombre de rama y queda
+con el formato `hldjhldj4/ele-<número>-<palabra-corta>`.
 
 ```powershell
 git switch dev          # asegúrate de estar en dev y actualizado
-git switch -c ELE-42/menu-listado
+git switch -c hldjhldj4/ele-42-menu-listado
 ```
 
-Ese `ELE-42` es el **número de tu issue**. Ya puedes abrir el proyecto y editar.
+Ese `ele-42` es el **número de tu issue**. Ya puedes abrir el proyecto y editar.
 
 ## 5. Dónde va cada cosa (mapa rápido)
 
@@ -125,7 +126,7 @@ Es material de consulta: **no se copia tal cual ni se edita**.
    `reservas`, `contacto`, `admin`, `infra`, `qa`, `po`, `docs`.
 4. Sube tu rama al repositorio en línea:
    ```powershell
-   git push -u origin ELE-42/menu-listado
+   git push -u origin hldjhldj4/ele-42-menu-listado
    ```
 5. Abre un **Pull Request**: ve a GitHub
    <https://github.com/Danielsteve18/Proyecto-Electiva-II>, toca

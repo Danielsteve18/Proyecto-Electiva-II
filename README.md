@@ -87,14 +87,14 @@ de GitHub). Para trabajar:
 
 ```bash
 git switch dev
-git switch -c ELE-42/menu-listado     # rama de la issue (id de Linear)
+git switch -c hldjhldj4/ele-42-menu-listado   # nombre sugerido por Linear
 # ... cambios ...
-git push -u origin ELE-42/menu-listado
+git push -u origin hldjhldj4/ele-42-menu-listado
 # abrir Pull Request hacia dev
 ```
 
-Convención de nombres de rama: `ELE-N/<slug>` (número de la issue de Linear +
-palabra corta, p. ej. `ELE-42/menu-listado`). Commits en estilo Conventional
+Convención de nombres de rama: el nombre que sugiere Linear,
+`<usuario>/ele-N-<slug>` (p. ej. `hldjhldj4/ele-42-menu-listado`). Commits en estilo Conventional
 Commits **con scope de área**: `feat(frontend): …`, `fix(auth): …`, `docs: …`,
 `chore: …`. Áreas: `frontend`, `auth`, `menu`, `reservas`, `contacto`, `admin`,
 `infra`, `qa`, `po`, `docs`.
