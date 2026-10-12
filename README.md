@@ -98,9 +98,27 @@ Conventional Commits (`feat: …`, `fix: …`, `chore: …`).
 
 ## Variables de entorno
 
-Crear `.env.local` (no se versiona) con las credenciales de Supabase:
+La conexión a Supabase se configura en un archivo `.env.local` (no se versiona).
+Parte de la plantilla `.env.example` y rellena tus credenciales:
 
+```bash
+# Crea una copia de .env.example con el nombre .env.local
 ```
-NEXT_PUBLIC_SUPABASE_URL=...
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+
+| Variable | Ámbito | Descripción |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Público | URL del proyecto (`https://<ref>.supabase.co`). |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Público | Llave pública (anon o `sb_publishable_…`). Respeta RLS. |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Solo servidor** | Llave secreta (service role o `sb_secret_…`). **Salta RLS**: nunca la expongas al cliente. |
+
+Los clientes se crean en `lib/supabase/`:
+
+- `client.ts` → navegador (Client Components).
+- `server.ts` → servidor (Server Components, Server Actions, Route Handlers).
+- `admin.ts` → servidor, con la llave secreta (solo `server-only`).
+
+Comprueba la conexión en local (no necesita servidor web):
+
+```bash
+bun run test:supabase
 ```
