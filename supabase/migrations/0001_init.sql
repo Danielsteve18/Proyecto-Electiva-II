@@ -1,19 +1,5 @@
--- 0001_init.sql
--- ELE-8 · Migración inicial del esquema
--- Tablas: profiles, categories, dishes, daily_offers, reservations,
---         contact_messages, testimonials, posts, schedule
+-- 0001_init.sql · ELE-8 · Migración inicial del esquema
 
--- ---------------------------------------------------------------
--- (Solo mientras pruebas) descomenta para reiniciar el esquema
--- ---------------------------------------------------------------
--- drop view  if exists reservation_slot_usage;
--- drop table if exists schedule, posts, testimonials, contact_messages,
---                      reservations, daily_offers, dishes, categories,
---                      profiles cascade;
-
--- ---------------------------------------------------------------
--- profiles
--- ---------------------------------------------------------------
 create table profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   full_name text,
@@ -22,9 +8,6 @@ create table profiles (
   created_at timestamptz not null default now()
 );
 
--- ---------------------------------------------------------------
--- categories
--- ---------------------------------------------------------------
 create table categories (
   id bigint generated always as identity primary key,
   name text not null unique,
@@ -33,9 +16,6 @@ create table categories (
   active boolean not null default true
 );
 
--- ---------------------------------------------------------------
--- dishes
--- ---------------------------------------------------------------
 create table dishes (
   id bigint generated always as identity primary key,
   category_id bigint not null references categories(id) on delete restrict,
@@ -46,12 +26,8 @@ create table dishes (
   available boolean not null default true,
   created_at timestamptz not null default now()
 );
-
 create index dishes_category_id_idx on dishes(category_id);
 
--- ---------------------------------------------------------------
--- daily_offers (plato del día / ofertas por fecha)
--- ---------------------------------------------------------------
 create table daily_offers (
   id bigint generated always as identity primary key,
   dish_id bigint not null references dishes(id) on delete cascade,
@@ -62,12 +38,8 @@ create table daily_offers (
   created_at timestamptz not null default now(),
   unique (dish_id, offer_date)
 );
-
 create index daily_offers_date_idx on daily_offers(offer_date);
 
--- ---------------------------------------------------------------
--- reservations
--- ---------------------------------------------------------------
 create table reservations (
   id bigint generated always as identity primary key,
   user_id uuid references auth.users(id) on delete set null, -- null = invitado
@@ -79,34 +51,24 @@ create table reservations (
   status text not null default 'pendiente'
     check (status in ('pendiente','confirmada','cancelada')),
   created_at timestamptz not null default now(),
-  -- Consistencia: o hay usuario, o hay nombre y teléfono de invitado
   constraint reservations_owner_chk check (
     user_id is not null
     or (guest_name is not null and guest_phone is not null)
   )
 );
-
--- Para consultar el cupo por fecha + hora rápidamente
 create index reservations_slot_idx
   on reservations(reserved_date, reserved_time)
   where status <> 'cancelada';
-
 create index reservations_user_idx on reservations(user_id);
 
--- Cupo usado por franja (las canceladas no cuentan)
 create view reservation_slot_usage as
-select
-  reserved_date,
-  reserved_time,
-  count(*)      as reservations_count,
-  sum(people)   as people_total
+select reserved_date, reserved_time,
+       count(*) as reservations_count,
+       sum(people) as people_total
 from reservations
 where status <> 'cancelada'
 group by reserved_date, reserved_time;
 
--- ---------------------------------------------------------------
--- contact_messages
--- ---------------------------------------------------------------
 create table contact_messages (
   id bigint generated always as identity primary key,
   name text not null,
@@ -117,9 +79,6 @@ create table contact_messages (
   created_at timestamptz not null default now()
 );
 
--- ---------------------------------------------------------------
--- testimonials
--- ---------------------------------------------------------------
 create table testimonials (
   id bigint generated always as identity primary key,
   user_id uuid references auth.users(id) on delete set null,
@@ -130,9 +89,6 @@ create table testimonials (
   created_at timestamptz not null default now()
 );
 
--- ---------------------------------------------------------------
--- posts (blog / novedades)
--- ---------------------------------------------------------------
 create table posts (
   id bigint generated always as identity primary key,
   author_id uuid references profiles(id) on delete set null,
@@ -145,12 +101,8 @@ create table posts (
   published_at timestamptz,
   created_at timestamptz not null default now()
 );
-
 create index posts_published_idx on posts(published, published_at desc);
 
--- ---------------------------------------------------------------
--- schedule (horario semanal)
--- ---------------------------------------------------------------
 create table schedule (
   id bigint generated always as identity primary key,
   day_of_week smallint not null unique check (day_of_week between 0 and 6), -- 0 = domingo
