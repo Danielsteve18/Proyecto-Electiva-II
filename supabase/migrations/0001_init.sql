@@ -1,6 +1,6 @@
 -- 0001_init.sql · ELE-8 · Migración inicial del esquema
 
-create table profiles (
+create table if not exists profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   full_name text,
   phone text,
@@ -8,7 +8,7 @@ create table profiles (
   created_at timestamptz not null default now()
 );
 
-create table categories (
+create table if not exists categories (
   id bigint generated always as identity primary key,
   name text not null unique,
   slug text not null unique,
@@ -16,7 +16,7 @@ create table categories (
   active boolean not null default true
 );
 
-create table dishes (
+create table if not exists dishes (
   id bigint generated always as identity primary key,
   category_id bigint not null references categories(id) on delete restrict,
   name text not null,
@@ -26,9 +26,9 @@ create table dishes (
   available boolean not null default true,
   created_at timestamptz not null default now()
 );
-create index dishes_category_id_idx on dishes(category_id);
+create index if not exists dishes_category_id_idx on dishes(category_id);
 
-create table daily_offers (
+create table if not exists daily_offers (
   id bigint generated always as identity primary key,
   dish_id bigint not null references dishes(id) on delete cascade,
   offer_date date not null,
@@ -38,9 +38,9 @@ create table daily_offers (
   created_at timestamptz not null default now(),
   unique (dish_id, offer_date)
 );
-create index daily_offers_date_idx on daily_offers(offer_date);
+create index if not exists daily_offers_date_idx on daily_offers(offer_date);
 
-create table reservations (
+create table if not exists reservations (
   id bigint generated always as identity primary key,
   user_id uuid references auth.users(id) on delete set null, -- null = invitado
   guest_name text,
@@ -56,12 +56,12 @@ create table reservations (
     or (guest_name is not null and guest_phone is not null)
   )
 );
-create index reservations_slot_idx
+create index if not exists reservations_slot_idx
   on reservations(reserved_date, reserved_time)
   where status <> 'cancelada';
-create index reservations_user_idx on reservations(user_id);
+create index if not exists reservations_user_idx on reservations(user_id);
 
-create view reservation_slot_usage as
+create or replace view reservation_slot_usage as
 select reserved_date, reserved_time,
        count(*) as reservations_count,
        sum(people) as people_total
@@ -69,7 +69,7 @@ from reservations
 where status <> 'cancelada'
 group by reserved_date, reserved_time;
 
-create table contact_messages (
+create table if not exists contact_messages (
   id bigint generated always as identity primary key,
   name text not null,
   email text not null,
@@ -79,7 +79,7 @@ create table contact_messages (
   created_at timestamptz not null default now()
 );
 
-create table testimonials (
+create table if not exists testimonials (
   id bigint generated always as identity primary key,
   user_id uuid references auth.users(id) on delete set null,
   author_name text not null,
@@ -89,7 +89,7 @@ create table testimonials (
   created_at timestamptz not null default now()
 );
 
-create table posts (
+create table if not exists posts (
   id bigint generated always as identity primary key,
   author_id uuid references profiles(id) on delete set null,
   title text not null,
@@ -101,9 +101,9 @@ create table posts (
   published_at timestamptz,
   created_at timestamptz not null default now()
 );
-create index posts_published_idx on posts(published, published_at desc);
+create index if not exists posts_published_idx on posts(published, published_at desc);
 
-create table schedule (
+create table if not exists schedule (
   id bigint generated always as identity primary key,
   day_of_week smallint not null unique check (day_of_week between 0 and 6), -- 0 = domingo
   open_time time,
