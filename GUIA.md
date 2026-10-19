@@ -128,7 +128,10 @@ Es material de consulta: **no se copia tal cual ni se edita**.
    ```powershell
    git push -u origin hldjhldj4/ele-42-menu-listado
    ```
-5. Abre un **Pull Request**: ve a GitHub
+5. Ejecuta el **smoke test** de `docs/qa.md` (build, arranque, rutas y
+   lectura pública de Supabase; tarda ~5 minutos). Es regla del equipo:
+   nadie pide revisión sin haberlo corrido en su rama.
+6. Abre un **Pull Request**: ve a GitHub
    <https://github.com/Danielsteve18/Proyecto-Electiva-II>, toca
    *Compare & pull request*. El **base** debe ser `dev` (¡nunca `main`!) y el
    **compare** tu rama. Pon el título `ELE-42 · título de la issue` y pega los
