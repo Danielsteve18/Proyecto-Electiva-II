@@ -161,8 +161,8 @@ no son funciones para el usuario final.
 
 ### Menú y catálogo
 
-- **RF-04** · Página de menú con categorías (Aperitivos, Principales, Acompañamientos,
-  Postres); cada plato muestra nombre, descripción, precio e imagen.
+- **RF-04** · Página de menú con categorías (Aperitivos, Platos Principales,
+  Acompañamientos, Postres); cada plato muestra nombre, descripción, precio e imagen.
 - **RF-05** · Filtro por categoría y búsqueda por nombre, sin recargar la página.
 - **RF-06** · Ofertas diarias con precio especial, visibles en el home y en el menú (badge).
 - **RF-07** · Home con: presentación, sobre nosotros, categorías, ofertas del día,
