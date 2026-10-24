@@ -91,8 +91,8 @@ drop policy if exists "reservas_select" on reservations;
 create policy "reservas_select" on reservations for select
                                                              using (user_id = auth.uid() or public.is_admin());
 
--- El backlog (ELE-30) admite reservas de invitados: user_id null = invitado,
--- autenticada con user_id = auth.uid(). Arquitectura: "reserva con o sin cuenta".
+-- Reservas de invitados permitidas: user_id puede ser null (el constraint
+-- reservations_owner_chk exige guest_name y guest_phone en ese caso).
 drop policy if exists "reservas_insert" on reservations;
 create policy "reservas_insert" on reservations for insert
   with check (user_id is null or user_id = auth.uid());
