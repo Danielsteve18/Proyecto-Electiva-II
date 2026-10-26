@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-
+import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: {
     default: "Sabor al Instante",
@@ -12,7 +12,9 @@ export const metadata: Metadata = {
     "Sabor al Instante: menú, reservas y contacto. Sistema de gestión para el restaurante.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
   return (
     <html lang="es" className="h-full antialiased">
       <head>
@@ -22,7 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <Header />
+       <Header isLoggedIn={!!user} />
         <div className="flex flex-1 flex-col">{children}</div>
         <Footer />
       </body>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { logout } from '@/app/login/actions';
 
 const links = [
 	{ href: '/', label: 'Inicio' },
@@ -13,7 +14,7 @@ const links = [
 ];
 
 // Breakpoint del sitio original: 992px
-export function Header() {
+export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
 	const [open, setOpen] = useState(false);
 	const close = () => setOpen(false);
 
@@ -56,6 +57,13 @@ export function Header() {
 							</li>
 						))}
 					</ul>
+					{isLoggedIn ? (
+                      <form action={logout}>
+                        <button type="submit">Salir</button>
+                      </form>
+                    ) : (
+                      <Link href="/login">Iniciar sesión</Link>
+                    )}
 				</nav>
 
 				{/* Botón Login (desktop) */}
