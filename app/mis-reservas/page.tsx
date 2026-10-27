@@ -1,5 +1,7 @@
 import { requireUser } from '@/lib/auth';
 
+export const instant = false;
+
 export default async function MisReservasPage() {
   const user = await requireUser();
 
