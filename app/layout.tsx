@@ -1,8 +1,19 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from "@/lib/supabase/server";
+
+async function HeaderWithSession() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  return <Header isLoggedIn={!!user} />;
+}
+
 export const metadata: Metadata = {
   title: {
     default: "Sabor al Instante",
@@ -12,9 +23,7 @@ export const metadata: Metadata = {
     "Sabor al Instante: menú, reservas y contacto. Sistema de gestión para el restaurante.",
 };
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es" className="h-full antialiased">
       <head>
@@ -24,7 +33,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="min-h-full flex flex-col">
-       <Header isLoggedIn={!!user} />
+        <Suspense fallback={<Header isLoggedIn={false} />}>
+          <HeaderWithSession />
+        </Suspense>
         <div className="flex flex-1 flex-col">{children}</div>
         <Footer />
       </body>
