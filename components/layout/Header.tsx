@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { logout } from '@/app/login/actions';
 
 const links = [
 	{ href: '/', label: 'Inicio' },
@@ -12,8 +13,11 @@ const links = [
 	{ href: '/sobrenosotros', label: 'Sobre nosotros' },
 ];
 
+const ctaClass =
+	'flex cursor-pointer items-center gap-[10px] rounded-full border-none bg-[var(--color-primary)] px-[25px] py-[17px] text-base font-bold capitalize text-[var(--color-light)] no-underline transition-colors duration-300 hover:bg-[var(--color-light)] hover:text-[var(--dark-color-divider)] max-[992px]:hidden';
+
 // Breakpoint del sitio original: 992px
-export function Header() {
+export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
 	const [open, setOpen] = useState(false);
 	const close = () => setOpen(false);
 
@@ -58,14 +62,20 @@ export function Header() {
 					</ul>
 				</nav>
 
-				{/* Botón Login (desktop) */}
-				<Link
-					href="/login"
-					className="flex items-center gap-[10px] rounded-full bg-[var(--color-primary)] px-[25px] py-[17px] text-base font-bold capitalize text-[var(--color-light)] no-underline transition-colors duration-300 hover:bg-[var(--color-light)] hover:text-[var(--dark-color-divider)] max-[992px]:hidden"
-				>
-					Login
-					<i className="fa-solid fa-arrow-right" aria-hidden="true" />
-				</Link>
+				{/* Acción de sesión (desktop) */}
+				{isLoggedIn ? (
+					<form action={logout}>
+						<button type="submit" className={ctaClass}>
+							Salir
+							<i className="fa-solid fa-arrow-right-from-bracket" aria-hidden="true" />
+						</button>
+					</form>
+				) : (
+					<Link href="/login" className={ctaClass}>
+						Login
+						<i className="fa-solid fa-arrow-right" aria-hidden="true" />
+					</Link>
+				)}
 
 				{/* Botón hamburguesa (móvil) */}
 				<button
@@ -91,7 +101,7 @@ export function Header() {
 				}`}
 			>
 				<ul className="flex flex-col items-start gap-5 p-5">
-					{[...links, { href: '/login', label: 'Login' }].map((l) => (
+					{links.map((l) => (
 						<li key={l.href} className="w-full">
 							<Link
 								href={l.href}
@@ -103,6 +113,29 @@ export function Header() {
 							</Link>
 						</li>
 					))}
+					<li className="w-full">
+						{isLoggedIn ? (
+							<form action={logout}>
+								<button
+									type="submit"
+									onClick={close}
+									tabIndex={open ? 0 : -1}
+									className="cursor-pointer border-none bg-transparent p-0 text-base font-normal text-[var(--color-light)] transition-colors duration-300 hover:text-[var(--dark-color-divider)]"
+								>
+									Salir
+								</button>
+							</form>
+						) : (
+							<Link
+								href="/login"
+								onClick={close}
+								tabIndex={open ? 0 : -1}
+								className="block text-base font-normal text-[var(--color-light)] no-underline transition-colors duration-300 hover:text-[var(--dark-color-divider)]"
+							>
+								Login
+							</Link>
+						)}
+					</li>
 				</ul>
 			</div>
 		</header>
