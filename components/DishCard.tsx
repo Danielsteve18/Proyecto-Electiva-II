@@ -12,7 +12,6 @@ type Dish = {
 export function DishCard({ dish, oferta }: { dish: Dish; oferta?: number }) {
   return (
     <article className="overflow-hidden rounded-2xl bg-white shadow transition hover:shadow-lg">
-      {/* Contenedor con fallback gris bg-[#aeb0b4] */}
       <div className="relative h-44 w-full bg-[#aeb0b4]">
         {dish.image_url && (
           <Image
