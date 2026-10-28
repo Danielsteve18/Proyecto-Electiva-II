@@ -1,7 +1,18 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { createClient } from "@/lib/supabase/server";
+
+async function HeaderWithSession() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  return <Header isLoggedIn={!!user} />;
+}
 
 export const metadata: Metadata = {
   title: {
@@ -22,7 +33,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <Header />
+        <Suspense fallback={<Header isLoggedIn={false} />}>
+          <HeaderWithSession />
+        </Suspense>
         <div className="flex flex-1 flex-col">{children}</div>
         <Footer />
       </body>
