@@ -31,7 +31,7 @@ const socials = [
 
 export function Footer() {
 	return (
-		<footer className="bg-[var(--dark-color-divider)] px-[15px] pb-[30px] pt-[100px] min-[993px]:px-0 min-[993px]:py-[100px]">
+		<footer className="bg-[var(--dark-color-divider)] text-[var(--text-color)] px-[15px] pb-[30px] pt-[100px] min-[993px]:px-0 min-[993px]:py-[100px]">
 			<div className="mx-auto flex max-w-[1200px] flex-col gap-10 min-[993px]:gap-20">
 				<div>
 					{/* Logo */}
