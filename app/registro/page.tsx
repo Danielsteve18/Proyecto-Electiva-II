@@ -1,12 +1,19 @@
+import { AuthShell } from '@/components/auth/AuthShell';
 import { RegistroForm } from '@/components/forms/registro-form';
 
 export const metadata = { title: 'Crear cuenta' };
 
 export default function RegistroPage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-4">
-      <h1 className="text-2xl font-semibold text-foreground">Crear cuenta</h1>
+    <AuthShell
+      icon="fa-user-plus"
+      title="Crear nueva cuenta"
+      subtitle="Completa el formulario para registrarte"
+      switchText="¿Ya tienes cuenta?"
+      switchLabel="Iniciar sesión"
+      switchHref="/login"
+    >
       <RegistroForm />
-    </main>
+    </AuthShell>
   );
 }

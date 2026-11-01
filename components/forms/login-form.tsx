@@ -2,20 +2,40 @@
 
 import { useActionState } from 'react';
 import { login } from '@/app/login/actions';
-const inputClass =
-  'rounded-md border border-input bg-background px-3 py-2 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
+import { AuthAlert } from '@/components/auth/AuthAlert';
+import { AuthField } from '@/components/auth/AuthField';
+import { AuthSubmit } from '@/components/auth/AuthSubmit';
 
 export function LoginForm() {
   const [state, formAction, pending] = useActionState(login, null);
 
   return (
-    <form action={formAction} className="flex flex-col gap-3">
-      <input name="email" type="email" placeholder="Correo" required className={inputClass} />
-      <input name="password" type="password" placeholder="Contraseña" required className={inputClass} />
-      {state?.error && <p className="text-red-600">{state.error}</p>}
-      <button type="submit" disabled={pending} className="rounded-md bg-primary px-4 py-2 text-primary-foreground disabled:opacity-60">
-        {pending ? 'Entrando…' : 'Entrar'}
-      </button>
+    <form action={formAction} className="flex flex-col gap-6">
+      {state?.error && <AuthAlert type="error">{state.error}</AuthAlert>}
+
+      <AuthField
+        id="email"
+        name="email"
+        label="Correo electrónico"
+        type="email"
+        icon="fa-envelope"
+        placeholder="correo@ejemplo.com"
+        autoComplete="email"
+        invalidMessage="Escribe un correo válido, por ejemplo nombre@correo.com"
+        keepValue
+      />
+      <AuthField
+        id="password"
+        name="password"
+        label="Contraseña"
+        type="password"
+        icon="fa-lock"
+        placeholder="Ingresa tu contraseña"
+        autoComplete="current-password"
+        invalidMessage="Escribe tu contraseña"
+      />
+
+      <AuthSubmit pending={pending} label="Iniciar sesión" pendingLabel="Entrando…" />
     </form>
   );
 }
