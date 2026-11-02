@@ -26,6 +26,10 @@ Este proyecto construye la solución digital completa del restaurante:
 Con esto el restaurante pasa a operar su presencia online de punta a punta: del menú
 a la reserva, con todo administrable desde un solo lugar.
 
+> **Documentación:** la gestión del proyecto vive en Linear. Empieza por el
+> [Mapa de documentación — Sabor al Instante](https://linear.app/dsteve18/document/mapa-de-documentacion-sabor-al-instante-cbc6f4932fc3).
+> En el repo, `docs/` contiene punteros y `GUIA.md` explica el flujo de trabajo.
+
 ## Requisitos
 
 - [Bun](https://bun.sh) `>= 1.3` (gestor de paquetes del proyecto). **No usar `npm`.**
@@ -68,11 +72,16 @@ hooks/                  Hooks de React reutilizables (useAlgo.ts)
 types/                  Tipos de TypeScript (database.ts de Supabase, modelos)
 public/                 Archivos estáticos servidos tal cual
   images/               Imágenes del sitio
-supabase/               Migraciones SQL y seed (se crea al configurar Supabase)
-scripts/                setup-hooks.ps1 / setup-hooks.sh
+supabase/               Migraciones SQL y seed
+scripts/                setup-hooks.ps1|.sh, test-supabase.mjs
+docs/                   Punteros a la documentación (índice: docs/README.md → Linear)
 ```
 
 Alias de importación: `@/` apunta a la raíz (`@/components/ui/button`, `@/lib/utils`).
+
+Material de estudio: la rama `referencia` contiene el sitio original (HTML/CSS/JS e imágenes)
+que sirve de guía visual y funcional. No se ejecuta ni se despliega; se consulta como
+referencia. Instrucciones en [`GUIA.md` §7](GUIA.md#7-usar-la-carpeta-de-referencia).
 
 ## ¿Dónde va cada cosa?
 
