@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:supabase": "bun scripts/test-supabase.mjs"
+    "test:supabase": "bun scripts/test-supabase.mjs",
+    "test:auth": "bun scripts/test-auth-flow.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
