@@ -157,6 +157,67 @@ Comprueba la conexión en local (no necesita servidor web):
 bun run test:supabase
 ```
 
+## Autenticación y roles
+
+La sesión se gestiona con Supabase Auth a través de `@supabase/ssr`. Los clientes viven
+en `lib/supabase/` (`client.ts`, `server.ts`, `admin.ts`) y `proxy.ts` refresca la sesión
+en cada petición.
+
+### Roles
+
+| Rol | Cómo se asigna | Acceso |
+| --- | --- | --- |
+| `cliente` | Automático al registrarse (trigger `on_auth_user_created` de `0004_handle_new_user.sql`) | Sitio público y sus propias reservas |
+| `admin` | Manual, por SQL (ver abajo) | Además, panel `/admin` y Server Actions de administración |
+
+`profiles.role` tiene `check (role in ('cliente','admin'))` y valor por defecto `cliente`
+(`0001_init.sql`). El trigger crea el perfil siempre como `cliente`: nunca toma el rol de
+los datos que envía el usuario.
+
+### Helpers de sesión y permisos
+
+En `lib/auth.ts`:
+
+| Helper | Qué hace |
+| --- | --- |
+| `requireUser()` | Devuelve el usuario o redirige a `/login`. |
+| `getPerfil()` | Devuelve `{ id, full_name, role }` del usuario o `null`. |
+| `isAdmin()` | `true` si el perfil tiene `role = 'admin'`. |
+| `requireAdmin()` | Lanza `No autorizado` si el usuario no es admin. |
+
+`proxy.ts` protege `/admin/:path*` y `/mis-reservas`: sin sesión redirige a `/login`.
+Además, cada página o Server Action de administración debe comprobar el rol; el panel
+completo llega en ELE-43.
+
+### Promover un usuario a admin
+
+En Supabase → **SQL Editor** (o con la llave `service_role` desde el servidor):
+
+```sql
+update profiles
+set role = 'admin'
+where id = (select id from auth.users where email = 'admin@ejemplo.com');
+```
+
+Para quitar el rol, el mismo `update` con `role = 'cliente'`.
+No expongas `SUPABASE_SERVICE_ROLE_KEY` en el cliente: salta RLS.
+
+### Guard en Server Actions
+
+```ts
+'use server';
+
+import { requireAdmin } from '@/lib/auth';
+
+export async function accionDeAdmin() {
+  await requireAdmin();
+  // ... lógica solo para admin
+}
+```
+
+Prueba rápida: con un usuario `cliente`, `isAdmin()` es `false`; tras el `update`
+anterior, vuelve a iniciar sesión y `isAdmin()` es `true`.
+
 ## Requisitos funcionales
 
 Derivados del backlog del proyecto (épicas E1–E6). E0 es infraestructura y E7 es QA/entrega,
