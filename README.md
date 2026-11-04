@@ -167,7 +167,12 @@ bun run dev        # en otra terminal
 bun run test:auth
 ```
 
-`test:auth` crea un usuario temporal en Supabase y lo elimina al terminar.
+`test:auth` crea un usuario temporal en Supabase y lo elimina al terminar. Por defecto usa la
+Admin API para no gastar correos (Supabase limita el envío); para probar también el registro real:
+
+```powershell
+$env:TEST_AUTH_SIGNUP=1; bun run test:auth
+```
 
 ## Requisitos funcionales
 

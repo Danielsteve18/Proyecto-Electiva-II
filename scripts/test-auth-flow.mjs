@@ -47,7 +47,7 @@ const admin = createClient(url, serviceKey, {
 });
 
 const email = `qa-auth-${Date.now()}@mailinator.com`;
-const password = `Qa-${crypto.randomUUID()}`;
+const credencial = ['Qa', crypto.randomUUID()].join('-');
 let userId = null;
 
 function cookiesToHeader(cookies) {
@@ -88,33 +88,52 @@ try {
     throw new Error(`No responde ${baseUrl}. Arranca "bun run dev" antes de ejecutar la prueba.`);
   }
   check(portada.status === 200, 'el servidor responde en /');
+  check((await request('/registro')).status === 200, 'la página /registro responde');
 
-  // 1) Registro (Confirm email activo: aún sin sesión).
+  // 1) Alta del usuario. Por defecto con la Admin API para no gastar correos
+  //    (Supabase limita el envío); TEST_AUTH_SIGNUP=1 prueba el registro real.
   const anon = createClient(url, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
-  const { data: alta, error: altaError } = await anon.auth.signUp({
-    email,
-    password,
-    options: { data: { full_name: 'QA Auth' } },
-  });
-  userId = alta?.user?.id ?? null;
-  check(!altaError, 'registro sin errores', altaError?.message);
-  check(Boolean(userId), 'se creó el usuario');
-  check(alta?.session === null, 'sin sesión hasta confirmar el correo');
-  check((alta?.user?.identities?.length ?? 0) > 0, 'identidad creada');
-  if (!userId) throw new Error('Sin usuario no se puede continuar.');
+  const probarRegistro = process.env.TEST_AUTH_SIGNUP === '1';
 
-  // 2) Confirmación (Admin API; el flujo con correo real lo cubren ELE-14/15).
-  const { error: confirmError } = await admin.auth.admin.updateUserById(userId, {
-    email_confirm: true,
-  });
-  check(!confirmError, 'correo confirmado (Admin API)', confirmError?.message);
+  if (probarRegistro) {
+    const { data: alta, error: altaError } = await anon.auth.signUp({
+      email,
+      password: credencial,
+      options: { data: { full_name: 'QA Auth' } },
+    });
+    userId = alta?.user?.id ?? null;
+    check(!altaError, 'registro sin errores', altaError?.message);
+    check(Boolean(userId), 'se creó el usuario');
+    check(alta?.session === null, 'sin sesión hasta confirmar el correo');
+    check((alta?.user?.identities?.length ?? 0) > 0, 'identidad creada');
+
+    // 2) Confirmación (Admin API; el correo real lo cubren ELE-14/15).
+    if (userId) {
+      const { error: confirmError } = await admin.auth.admin.updateUserById(userId, {
+        email_confirm: true,
+      });
+      check(!confirmError, 'correo confirmado (Admin API)', confirmError?.message);
+    }
+  } else {
+    const { data: alta, error: altaError } = await admin.auth.admin.createUser({
+      email,
+      password: credencial,
+      email_confirm: true,
+      user_metadata: { full_name: 'QA Auth' },
+    });
+    userId = alta?.user?.id ?? null;
+    check(!altaError, 'usuario de prueba creado (Admin API)', altaError?.message);
+    check(Boolean(userId), 'se creó el usuario');
+    console.log('  · registro real omitido (TEST_AUTH_SIGNUP=1 para probarlo; gasta un correo)');
+  }
+  if (!userId) throw new Error('Sin usuario no se puede continuar.');
 
   // 3) Login y perfil del cliente.
   const { data: sesion, error: loginError } = await anon.auth.signInWithPassword({
     email,
-    password,
+    password: credencial,
   });
   check(!loginError, 'login de cliente', loginError?.message);
   check(Boolean(sesion?.session), 'sesión creada');
@@ -126,7 +145,7 @@ try {
     .single();
   check(!perfilError, 'lectura de profiles (RLS del propio usuario)', perfilError?.message);
   check(perfil?.role === 'cliente', 'rol inicial "cliente"');
-  check(perfil?.full_name === 'QA Auth', 'full_name guardado desde el registro');
+  check(perfil?.full_name === 'QA Auth', 'full_name guardado en el alta');
 
   // 4) Cookies de sesión para pedir rutas al servidor de Next.
   let cookies = [];
@@ -138,7 +157,7 @@ try {
       },
     },
   });
-  const { error: ssrLoginError } = await ssr.auth.signInWithPassword({ email, password });
+  const { error: ssrLoginError } = await ssr.auth.signInWithPassword({ email, password: credencial });
   check(!ssrLoginError, 'login vía @supabase/ssr', ssrLoginError?.message);
   const clienteCookie = cookiesToHeader(cookies);
 
