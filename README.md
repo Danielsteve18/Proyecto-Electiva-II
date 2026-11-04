@@ -45,9 +45,11 @@ bun run dev      # servidor de desarrollo en http://localhost:3000
 Otros scripts:
 
 ```bash
-bun run build    # build de producción
-bun run start    # sirve el build
-bun run lint     # lint (ESLint)
+bun run build         # build de producción
+bun run start         # sirve el build
+bun run lint          # lint (ESLint)
+bun run test:supabase # conexión con Supabase (no necesita servidor)
+bun run test:auth     # flujo de auth de punta a punta (requiere `bun run dev`)
 ```
 
 > **Hooks de git (una sola vez por clon):** ejecuta `pwsh scripts/setup-hooks.ps1`
@@ -155,6 +157,21 @@ Comprueba la conexión en local (no necesita servidor web):
 
 ```bash
 bun run test:supabase
+```
+
+El flujo de autenticación (registro, confirmación, login, roles y logout) se prueba con
+el servidor de desarrollo arriba:
+
+```bash
+bun run dev        # en otra terminal
+bun run test:auth
+```
+
+`test:auth` crea un usuario temporal en Supabase y lo elimina al terminar. Por defecto usa la
+Admin API para no gastar correos (Supabase limita el envío); para probar también el registro real:
+
+```powershell
+$env:TEST_AUTH_SIGNUP=1; bun run test:auth
 ```
 
 ## Requisitos funcionales
